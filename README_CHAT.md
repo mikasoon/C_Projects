@@ -1,25 +1,111 @@
-💬 Multi-Client Real-Time Chat Application
-A simple and fast command-line chat application built from scratch in C. It allows multiple users to join a single chat room and message each other instantly.
+# 💬 TCP Chat Application in C
 
-This project uses a Multi-Threaded Server to handle multiple users and an Epoll-powered Client to handle typing and receiving messages at the same time.
+A lightweight multi-client chat application built in **C** using **TCP sockets**, **POSIX threads (pthreads)**, and **epoll** for efficient I/O handling.
 
-⚙️ How It Works
-The Server 🖥️: Every time a new client connects, the server spawns a new thread (pthread) just for that user. To prevent users from crashing into each other when joining or leaving, the server uses a Mutex Lock to keep the client list safe and synchronized.
+This project demonstrates client-server communication, concurrent connection handling, message broadcasting, and event-driven programming in Linux.
 
-The Client 📱: Instead of getting stuck waiting for you to type, the client uses Linux epoll. This allows the program to watch your keyboard (so you can type) AND watch the server (so you can receive messages) at the exact same time.
+---
 
-✨ Features
-👥 Multi-User Support: Up to 100 people can join the chat room simultaneously.
+## 🚀 Features
 
-⚡ Instant Broadcasting: When you send a message, everyone else in the chat receives it instantly.
+### 🖥️ Server
 
-🔄 Smart Asynchronous I/O: You can receive incoming messages even while you are halfway through typing your own message.
+* Supports multiple simultaneous clients
+* Uses **POSIX threads** to handle each client independently
+* Broadcasts messages to all connected clients
+* Thread-safe client management using mutexes
+* Automatic client disconnection handling
 
-🔒 Safe Memory Management: Uses mutexes to prevent bugs when multiple users join or leave at the exact same moment.
+### 💻 Client
 
-📁 Project Structure
-Here is how the project files are organized:
-├── server.c          # The multi-threaded server source code
-├── client.c          # The epoll-powered client source code
-├── chat_server       # Executable server binary (generated after compilation)
-└── chat_client       # Executable client binary (generated after compilation)
+* Connects to the chat server via TCP
+* Uses **epoll** for efficient event monitoring
+* Simultaneously:
+
+  * Reads user input from the terminal
+  * Receives incoming messages from the server
+* Real-time communication
+
+---
+
+## 🏗️ System Overview
+
+```text
+              +------------------+
+              |   Chat Server    |
+              |------------------|
+              | Message Routing  |
+              | Client Manager   |
+              +--------+---------+
+                       |
+        +--------------+--------------+
+        |              |              |
+        v              v              v
+   +---------+    +---------+    +---------+
+   | Client  |    | Client  |    | Client  |
+   |    1    |    |    2    |    |    N    |
+   +---------+    +---------+    +---------+
+```
+
+The server acts as a central communication hub. Messages received from one client are broadcast to all other connected clients in real time.
+
+---
+
+## 📂 Project Structure
+
+```text
+.
+├── server.c    # Multi-threaded chat server
+├── client.c    # Epoll-based chat client
+└── README.md
+```
+
+---
+
+## 💬 Example Chat Session
+
+### Client 1
+
+```text
+Hello everyone!
+```
+
+### Client 2
+
+```text
+-> Hello everyone!
+```
+
+### Client 2
+
+```text
+Hi there!
+```
+
+### Client 1
+
+```text
+-> Hi there!
+```
+
+---
+
+## 🔒 Thread Safety
+
+The server uses:
+
+```c
+pthread_mutex_t clients_mutex;
+```
+
+to safely manage shared client resources and prevent race conditions when multiple threads access the client list simultaneously.
+
+---
+
+## 📝 Notes
+
+* Messages are broadcast to all connected clients except the sender.
+* The server supports multiple concurrent connections.
+* Client input and incoming messages are handled simultaneously using epoll.
+* Default communication port: **8080**.
+* Designed for Linux environments.
